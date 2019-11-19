@@ -1,48 +1,79 @@
-#Hola Nestor
+
 import pygame,sys
 from pygame.locals import *
 
+
+
+def inicializarTablero():
+	tablero=[[0 for x in range(0,8)] for y in range(0,8)]
+	tablero[0][2]=1
+	return tablero
+
 def DeseaJugar():
-	x=input("Desea Jugar")
+	x=input("Bienvenido.\n¿Desea Jugar?\nS o N: ")
 
-
-	if x=="S" or x=="si":
+	x=x.lower()
+	if x=="s" or x=="si":
 		A=True
 
-	elif x=="N" or "No":
+	elif x=="n" or x=="no":
 		A=False
 
 	return A
 
-def inicializarTablero():
-	tablero=[[0 for x in range(0,8)] for y in range(0,8)]
-	return tablero
+def Jugadores():
+	jugador1=input("\nIntroduzca nombre Jugador 1:")
+	jugador2=input("Introduzca nombre Jugador 2:")
+
+	return jugador1,jugador2
 
 
+def QuienJuega(jugador1,jugador2:str,turno:int):
+	if turno==1:
+		turno+=1
+		jugador=jugador2
 
-def QuienJuega(A:int):
-	if A==1:
-		A=2
-	elif A==2:
-		A=1
-	return A
+	elif turno==2:
+		turno-=1
+		jugador=jugador1
 
+	return turno,jugador
+
+
+def QuedanFichas(tablero:[[int]]):
 	
-
-def QuedanFichas(A:[[int]]):
-	cuenta=0
-
+	negras=0
+	blancas=0
 	for i in range(0,8):
 		for j in range(0,8):
-			if A[i][j]==0:
-				cuenta = cuenta +1
+			if tablero[i][j]==1:
+				negras += 1
+			elif tablero[i][j]==2:
+				blancas+=1
 
-	return cuenta
 
-def obtenerJugada():
-	x=int(input("Fila: "))
-	y=input("Columna: ")
-	letras='ABCDEFGH'	
+	total=64-(negras+blancas)
+	
+	return total,negras,blancas
+
+ 
+
+def obtenerJugada(jugador):
+	print("\nEs el turno de "+str(jugador)+":\nRealice su jugada:")
+		
+	letras='abcdefgh'	
+	while True:
+		try:
+			x=int(input("Fila: "))
+			assert(1<=x<=8)
+			y=input("Columna : ").lower()
+
+			assert(any(y==letras[i] for i in range(0,8)))
+			break
+		except:
+			print("Error. El valor de Fila debe ser (1,2,3,4,5,6,7,8). Columna debe ser (A,B,C,D,E,F,G,H)")	
+
+
 
 	for i in range(0,8):
 		if y==letras[i]:
@@ -52,12 +83,12 @@ def obtenerJugada():
 	return x,y
 
 
-def reflejarJugada(jugador,A,x,y):
-	A[x][y]=jugador
+def reflejarJugada(turno,A,x,y):
+	A[x][y]=turno
 
 
 
-def dibujar(A:[[int]]):
+def dibujar(A:[[int]],jugador1,jugador2,FichasNegras,FichasBlancas):
 	
 	
 	pygame.init()
@@ -101,7 +132,7 @@ def dibujar(A:[[int]]):
 	VENTANA.fill(GRIS)
 	
 
-	#Instertar Numeros y letras al tablero
+	#Instertar Numeros, y texto al tablero
 	
 	x=100
 	for i in range(0,8):
@@ -113,18 +144,20 @@ def dibujar(A:[[int]]):
 		VENTANA.blit(letras[i],(x,560))
 		x+=60
 	
-	VENTANA.blit(miFuente.render("Fila:",1,NEGRO),(620,50))
-	VENTANA.blit(miFuente.render("Columna:",1,NEGRO),(620,80))
+	
+	VENTANA.blit(miFuente.render(str(jugador1)+":"+str(FichasNegras),1,NEGRO),(600,100))
+	VENTANA.blit(miFuente.render(str(jugador2)+":"+str(FichasBlancas),1,NEGRO),(600,130))
 
 	#Insertar imagenes del tablero (Casillas, fichas)
 
+	
 	TableroPosy=80
 	
-	for y in range(0,8):
+	for x in range(0,8):
 		
 		TableroPosx=80
 		
-		for x in range(0,8):
+		for y in range(0,8):
 			
 			if A[x][y]==0:
 
@@ -133,9 +166,11 @@ def dibujar(A:[[int]]):
 			
 			elif A[x][y]==1:
 				TABLERO_POS[x][y]=VENTANA.blit(fichaNegra,(TableroPosx,TableroPosy))
+				
 
 			elif A[x][y]==2:
 				TABLERO_POS[x][y]=VENTANA.blit(fichaBlanca,(TableroPosx,TableroPosy))
+				
 			
 			TableroPosx+=60	
 		
@@ -153,21 +188,31 @@ def dibujar(A:[[int]]):
 
 
 
+##PROGRAMA PRINCIPAL
 
 tablero=inicializarTablero()
-jugador=2
+turno=2
 
 while DeseaJugar():
 	
-	dibujar(tablero)
+	jugador1,jugador2=Jugadores()
+
+	TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
 	
-	while QuedanFichas(tablero)>0:
+	dibujar(tablero,jugador1,jugador2,FichasNegras,FichasBlancas)
+	
+	
+	while TotalFichas>0:
 		
-		x,y=obtenerJugada()
-		jugador=QuienJuega(jugador)
+		turno,jugador=QuienJuega(jugador1,jugador2,turno)
 		
-		reflejarJugada(jugador,tablero,x,y)
-		dibujar(tablero)
+		x,y=obtenerJugada(jugador)
+		
+		reflejarJugada(turno,tablero,x,y)
+		
+		TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
+		
+		dibujar(tablero,jugador1,jugador2,FichasNegras,FichasBlancas)
 		
 		
 		
