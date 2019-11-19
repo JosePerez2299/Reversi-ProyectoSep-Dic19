@@ -10,6 +10,7 @@ def inicializarTablero():
 	tablero[4][4]=2
 	tablero[3][4]=1
 	tablero[4][3]=1
+
 	return tablero
 
 def DeseaJugar():
@@ -25,13 +26,23 @@ def DeseaJugar():
 	return A
 
 def Jugadores():
-	jugador1=input("\nIntroduzca nombre Jugador 1:")
-	jugador2=input("Introduzca nombre Jugador 2:")
+	while True:
+		try:
+			jugador1=input("\nIntroduzca nombre Jugador 1:")
+			assert(len(jugador1)>0)
+			jugador2=input("Introduzca nombre Jugador 2:")
+			assert(len(jugador2)>0)
+			break
+		except:
+			print("\n====Error=====\nIntroduzca como minimo un digito para su nombre\n============")
 
 	return jugador1,jugador2
 
 
-def QuienJuega(jugador1,jugador2:str,turno:int):
+def CambiarTurno(jugador1:str,jugador2:str,turno:int):
+
+	assert(0<turno<=2)
+	
 	if turno==1:
 		turno+=1
 		jugador=jugador2
@@ -40,10 +51,13 @@ def QuienJuega(jugador1,jugador2:str,turno:int):
 		turno-=1
 		jugador=jugador1
 
+	assert(0<turno<=2)
+
 	return turno,jugador
 
 
 def QuedanFichas(tablero:[[int]]):
+
 	
 	negras=0
 	blancas=0
@@ -54,14 +68,13 @@ def QuedanFichas(tablero:[[int]]):
 			elif tablero[i][j]==2:
 				blancas+=1
 
-
 	total=64-(negras+blancas)
 	
 	return total,negras,blancas
 
  
 
-def obtenerJugada(jugador):
+def obtenerJugada(jugador:str):
 	print("\nEs el turno de "+str(jugador)+":\nRealice su jugada:")
 		
 	letras='abcdefgh'	
@@ -74,8 +87,7 @@ def obtenerJugada(jugador):
 			assert(any(y==letras[i] for i in range(0,8)))
 			break
 		except:
-			print("\n====Error====\nEl valor de Fila debe ser (1,2,3,4,5,6,7,8). Columna debe ser (A,B,C,D,E,F,G,H)\n===========")	
-
+			print("\n====Error====\nEl valor de Fila debe ser (1,2,3,4,5,6,7,8). Columna debe ser (A,B,C,D,E,F,G,H)\n==========")	
 
 
 	for i in range(0,8):
@@ -86,17 +98,17 @@ def obtenerJugada(jugador):
 	return x,y
 
 
-def realizarJugada(turno,A,x,y):
+def realizarJugada(turno:int,A:[[int]],x:int,y:int):
 	A[x][y]=turno
 
 
 
-def dibujar(A:[[int]],jugador1,jugador2,FichasNegras,FichasBlancas):
-	
-	assert(len(A)==8 and all(len(A[i])==8 for i in range(0,len(A))))
+def dibujar(A:[[int]],jugador1:str,jugador2:str,FichasNegras:int,FichasBlancas:int):
+	assert(len(A)==8 and all(len(A[i])==8 for i in range(0,8)))
 
 	pygame.init()
 	
+	#Inicializar arreglo para almacenar casillas
 	TABLERO_POS=[[0 for x in range(0,8)] for y in range(0,8)]
 	ancho,largo=800,600
 	
@@ -149,6 +161,7 @@ def dibujar(A:[[int]],jugador1,jugador2,FichasNegras,FichasBlancas):
 		VENTANA.blit(letras[i],(x,560))
 		x+=60
 	
+	#Tablero de puntuacion
 	pygame.draw.rect(VENTANA,MARRON,(590,85,200,30),2)
 	pygame.draw.rect(VENTANA,MARRON,(590,120,200,90),2)
 	VENTANA.blit(miFuente.render("Puntuación",1,NEGRO),(600,90))
@@ -211,7 +224,7 @@ while DeseaJugar():
 	
 	while TotalFichas>0:
 		
-		turno,jugador=QuienJuega(jugador1,jugador2,turno)
+		turno,jugador=CambiarTurno(jugador1,jugador2,turno)
 		
 		x,y=obtenerJugada(jugador)
 		
