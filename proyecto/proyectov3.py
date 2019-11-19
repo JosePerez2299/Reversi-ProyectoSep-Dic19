@@ -6,7 +6,10 @@ from pygame.locals import *
 
 def inicializarTablero():
 	tablero=[[0 for x in range(0,8)] for y in range(0,8)]
-	tablero[0][2]=1
+	tablero[3][3]=2
+	tablero[4][4]=2
+	tablero[3][4]=1
+	tablero[4][3]=1
 	return tablero
 
 def DeseaJugar():
@@ -90,7 +93,8 @@ def reflejarJugada(turno,A,x,y):
 
 def dibujar(A:[[int]],jugador1,jugador2,FichasNegras,FichasBlancas):
 	
-	
+	assert(len(A)==8 and all(len(A[i])==8 for i in range(0,len(A))))
+
 	pygame.init()
 	
 	TABLERO_POS=[[0 for x in range(0,8)] for y in range(0,8)]
@@ -111,20 +115,21 @@ def dibujar(A:[[int]],jugador1,jugador2,FichasNegras,FichasBlancas):
 	miFuente=pygame.font.Font(None,40)
 	
 	#Colores
-	GRIS=(120,120,120)
+	GRIS=(130,130,130)
 	NEGRO=(0,0,0)
+	MARRON=(128,64,0)
 	
 
 	#Crear letras
 	letras=[
-	miFuente.render("A",1,NEGRO),  # 1:Bool, Alisado de las letras
-	miFuente.render("B",1,NEGRO),
-	miFuente.render("C",1,NEGRO),
-	miFuente.render("D",1,NEGRO),
-	miFuente.render("E",1,NEGRO),
-	miFuente.render("F",1,NEGRO),
-	miFuente.render("G",1,NEGRO),
-	miFuente.render("H",1,NEGRO)
+	miFuente.render("A",1,MARRON),  # 1:Bool, Alisado de las letras
+	miFuente.render("B",1,MARRON),
+	miFuente.render("C",1,MARRON),
+	miFuente.render("D",1,MARRON),
+	miFuente.render("E",1,MARRON),
+	miFuente.render("F",1,MARRON),
+	miFuente.render("G",1,MARRON),
+	miFuente.render("H",1,MARRON)
 	]	
 
 	
@@ -137,20 +142,22 @@ def dibujar(A:[[int]],jugador1,jugador2,FichasNegras,FichasBlancas):
 	x=100
 	for i in range(0,8):
 
-		VENTANA.blit(miFuente.render(str(i+1),1,NEGRO),(55,x))
-		VENTANA.blit(miFuente.render(str(i+1),1,NEGRO),(565,x))		
+		VENTANA.blit(miFuente.render(str(i+1),1,MARRON),(55,x))
+		VENTANA.blit(miFuente.render(str(i+1),1,MARRON),(565,x))		
 
 		VENTANA.blit(letras[i],(x,50))
 		VENTANA.blit(letras[i],(x,560))
 		x+=60
 	
-	
-	VENTANA.blit(miFuente.render(str(jugador1)+":"+str(FichasNegras),1,NEGRO),(600,100))
-	VENTANA.blit(miFuente.render(str(jugador2)+":"+str(FichasBlancas),1,NEGRO),(600,130))
+	pygame.draw.rect(VENTANA,MARRON,(590,90,200,30),2)
+	pygame.draw.rect(VENTANA,MARRON,(590,120,200,90),2)
+	VENTANA.blit(miFuente.render("Puntuación",1,NEGRO),(600,90))
+	VENTANA.blit(miFuente.render(str(jugador1.lower())+":"+str(FichasNegras),1,NEGRO),(600,130))
+	VENTANA.blit(miFuente.render(str(jugador2.lower())+":"+str(FichasBlancas),1,NEGRO),(600,160))
 
+	
 	#Insertar imagenes del tablero (Casillas, fichas)
 
-	
 	TableroPosy=80
 	
 	for x in range(0,8):
