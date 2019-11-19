@@ -74,7 +74,7 @@ def obtenerJugada(jugador):
 			assert(any(y==letras[i] for i in range(0,8)))
 			break
 		except:
-			print("Error. El valor de Fila debe ser (1,2,3,4,5,6,7,8). Columna debe ser (A,B,C,D,E,F,G,H)")	
+			print("\n====Error====\nEl valor de Fila debe ser (1,2,3,4,5,6,7,8). Columna debe ser (A,B,C,D,E,F,G,H)\n===========")	
 
 
 
@@ -86,7 +86,7 @@ def obtenerJugada(jugador):
 	return x,y
 
 
-def reflejarJugada(turno,A,x,y):
+def realizarJugada(turno,A,x,y):
 	A[x][y]=turno
 
 
@@ -149,7 +149,7 @@ def dibujar(A:[[int]],jugador1,jugador2,FichasNegras,FichasBlancas):
 		VENTANA.blit(letras[i],(x,560))
 		x+=60
 	
-	pygame.draw.rect(VENTANA,MARRON,(590,90,200,30),2)
+	pygame.draw.rect(VENTANA,MARRON,(590,85,200,30),2)
 	pygame.draw.rect(VENTANA,MARRON,(590,120,200,90),2)
 	VENTANA.blit(miFuente.render("Puntuación",1,NEGRO),(600,90))
 	VENTANA.blit(miFuente.render(str(jugador1.lower())+":"+str(FichasNegras),1,NEGRO),(600,130))
@@ -215,7 +215,7 @@ while DeseaJugar():
 		
 		x,y=obtenerJugada(jugador)
 		
-		reflejarJugada(turno,tablero,x,y)
+		realizarJugada(turno,tablero,x,y)
 		
 		TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
 		
