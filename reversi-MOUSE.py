@@ -1,5 +1,52 @@
 
+##es valida
+#Flanquear
+#obtener jugada
 
+def DeseaJugar():
+	#Crear Ventana
+	ancho,largo=800,600
+	VENTANA=pygame.display.set_mode((ancho,largo))
+	pygame.display.set_caption("¡Reversi! v0.1")
+
+
+	GRIS=(130,130,130)
+	NEGRO=(0,0,0)
+	MARRON=(128,64,0)
+	
+	TITULO=pygame.image.load("IMAGENES/TITULO.png")
+	FONDO=pygame.image.load("IMAGENES/FONDO.png")
+	JUGAR=pygame.image.load("IMAGENES/JUGAR.png")
+	SALIR=pygame.image.load("IMAGENES/SALIR.png")
+
+
+	
+	VENTANA.blit(FONDO,(0,0))
+
+	VENTANA.blit(TITULO,(120,10))
+	JUGAR_V=VENTANA.blit(JUGAR,(280,250))
+	SALIR_V=VENTANA.blit(SALIR,(290,350))
+	jugar=False
+	
+	while not(jugar):
+		for event in pygame.event.get():
+			if event.type==QUIT:
+				pygame.quit() 
+				sys.exit()
+
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				x,y=event.pos
+				
+				if JUGAR_V.collidepoint(x,y):
+					jugar=True
+
+				elif SALIR_V.collidepoint(x,y):
+					pygame.quit() 
+					sys.exit()
+		
+		pygame.display.update()
+
+	return jugar
 
 
 def inicializarTablero():
@@ -10,6 +57,8 @@ def inicializarTablero():
 	tablero[4][3]=1
 
 	return tablero
+
+
 def Jugadores():
 	#Crear Ventana
 	ancho,largo=800,600
@@ -134,21 +183,20 @@ def Jugadores():
 
 	return jugadores
 
-def CambiarTurno(jugadores:[str],turno:int):
+
+def CambiarTurno(turno:int):
 
 	assert(0<turno<=2)
 	
 	if turno==1:
-		turno+=1
-		jugador=jugadores[1]
+		turno+=1	
 
 	elif turno==2:
 		turno-=1
-		jugador=jugadores[0]
 
 	assert(0<turno<=2)
 
-	return turno,jugador
+	return turno
 
 
 def QuedanFichas(tablero:[[int]]):
@@ -167,12 +215,12 @@ def QuedanFichas(tablero:[[int]]):
 	
 	return total,negras,blancas
 
- 
 
 def obtenerJugada(jugador:str):
 	print("\nEs el turno de "+str(jugador)+":\nRealice su jugada:")
 		
 	letras='abcdefgh'	
+	
 	while True:
 		try:
 			x=int(input("Fila: "))
@@ -190,26 +238,16 @@ def obtenerJugada(jugador:str):
 			y=i
 	x=x-1
 
-	return x,y
+	return x,y######################
 
 
 def realizarJugada(turno:int,A:[[int]],x:int,y:int):
 	A[x][y]=turno
 
 
-
-def dibujar(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:int):
+def TableroYPuntuacion(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:int):
 
 	assert(len(A)==8 and all(len(A[i])==8 for i in range(0,8)))
-
-	#Eventos:
-
-	for event in pygame.event.get():
-		if event.type==QUIT:
-			pygame.quit() 
-			sys.exit()
-
-	
 	
 	#Inicializar arreglo para almacenar casillas
 	TABLERO_POS=[[0 for x in range(0,8)] for y in range(0,8)]
@@ -229,10 +267,11 @@ def dibujar(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:int):
 	fichaBlanca=pygame.image.load("IMAGENES/blanca.png")	
 	FONDO=pygame.image.load("IMAGENES/FONDO.png")
 	PUNTUACION=pygame.image.load("IMAGENES/PUNTUACION.png")
-	
+	SIGUIENTE=pygame.image.load("IMAGENES/SIGUIENTE.png")
 	#Colores
 	GRIS=(130,130,130)
 	VERDE=(72,111,25)
+	BLANCO=(255,255,255)
 	
 
 	#Crear letras
@@ -246,112 +285,183 @@ def dibujar(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:int):
 	fuente.render("G",1,GRIS),
 	fuente.render("H",1,GRIS)
 	]	
-
-	
-	#Pintar fondo de ventana
+			#Pintar fondo de ventana
 	VENTANA.blit(FONDO,(0,0))
+	siguiente=False
 	
+	while not(siguiente):
 
-	#Insertar imagenes del tablero (Casillas, fichas)
-	TableroPosy=60
-	
-	for x in range(0,8):
-		
-		TableroPosx=60
-		
-		for y in range(0,8):
+		#Insertar imagenes del tablero (Casillas, fichas)
+		TableroPosy=60
+
+		for x in range(0,8):
 			
-			if A[x][y]==0:
-
-				TABLERO_POS[x][y]=VENTANA.blit(casillaVacia,(TableroPosx,TableroPosy))
-				
+			TableroPosx=60
 			
-			elif A[x][y]==1:
-				TABLERO_POS[x][y]=VENTANA.blit(fichaNegra,(TableroPosx,TableroPosy))
+			for y in range(0,8):
 				
+				if A[x][y]==0:
 
-			elif A[x][y]==2:
-				TABLERO_POS[x][y]=VENTANA.blit(fichaBlanca,(TableroPosx,TableroPosy))
+					TABLERO_POS[x][y]=VENTANA.blit(casillaVacia,(TableroPosx,TableroPosy))
+					
 				
+				elif A[x][y]==1:
+					TABLERO_POS[x][y]=VENTANA.blit(fichaNegra,(TableroPosx,TableroPosy))
+					
+
+				elif A[x][y]==2:
+					TABLERO_POS[x][y]=VENTANA.blit(fichaBlanca,(TableroPosx,TableroPosy))
+					
+				
+				TableroPosx+=60	
 			
-			TableroPosx+=60	
-		
-		TableroPosy+=60
-	
-	#Instertar Numeros, y texto al tablero
-	
-	x=80
-	for i in range(0,8):
+			TableroPosy+=60
 
-		VENTANA.blit(fuente.render(str(i+1),1,GRIS),(35,x))
-		VENTANA.blit(fuente.render(str(i+1),1,GRIS),(545,x))		
+		#Instertar Numeros, y texto al tablero
 
-		VENTANA.blit(letras[i],(x,30))
-		VENTANA.blit(letras[i],(x,540))
-		x+=60
-	
-	#Tablero de puntuacion
-	pygame.draw.rect(VENTANA,GRIS,(590,80,200,40),4)
-	pygame.draw.rect(VENTANA,GRIS,(590,120,200,90),4)
-	VENTANA.blit(PUNTUACION,(600,75))
-	VENTANA.blit(fuente.render(str(jugadores[0])+": "+str(FichasNegras),1,VERDE),(600,130))
-	VENTANA.blit(fuente.render(str(jugadores[1])+": "+str(FichasBlancas),1,VERDE),(600,170))
+		PosLetrasNumeros=80
+		for i in range(0,8):
 
-	
-	
+			VENTANA.blit(fuente.render(str(i+1),1,GRIS),(35,PosLetrasNumeros))
+			VENTANA.blit(fuente.render(str(i+1),1,GRIS),(545,PosLetrasNumeros))		
 
-	
-	
-	
-	
-	pygame.display.update()
+			VENTANA.blit(letras[i],(PosLetrasNumeros,30))
+			VENTANA.blit(letras[i],(PosLetrasNumeros,540))
+			PosLetrasNumeros+=60
 
-	
-
-def DeseaJugar():
-	#Crear Ventana
-	ancho,largo=800,600
-	VENTANA=pygame.display.set_mode((ancho,largo))
-	pygame.display.set_caption("¡Reversi! v0.1")
+		#Tablero de puntuacion
+		pygame.draw.rect(VENTANA,GRIS,(590,120,200,40),4)
+		pygame.draw.rect(VENTANA,GRIS,(590,160,200,90),4)
+		VENTANA.blit(PUNTUACION,(600,115))
+		SIGUIENTE_V=VENTANA.blit(SIGUIENTE,(580,400))
+		VENTANA.blit(fuente.render(str(jugadores[0])+": "+str(FichasNegras),1,VERDE),(600,170))
+		VENTANA.blit(fuente.render(str(jugadores[1])+": "+str(FichasBlancas),1,VERDE),(600,210))
 
 
-	GRIS=(130,130,130)
-	NEGRO=(0,0,0)
-	MARRON=(128,64,0)
-	
-	TITULO=pygame.image.load("IMAGENES/TITULO.png")
-	FONDO=pygame.image.load("IMAGENES/FONDO.png")
-	JUGAR=pygame.image.load("IMAGENES/JUGAR.png")
-	SALIR=pygame.image.load("IMAGENES/SALIR.png")
-
-
-	
-	VENTANA.blit(FONDO,(0,0))
-
-	VENTANA.blit(TITULO,(120,10))
-	JUGAR_V=VENTANA.blit(JUGAR,(280,250))
-	SALIR_V=VENTANA.blit(SALIR,(290,350))
-	jugar=False
-	
-	while not(jugar):
 		for event in pygame.event.get():
 			if event.type==QUIT:
 				pygame.quit() 
 				sys.exit()
 
-			if event.type == pygame.MOUSEBUTTONDOWN:
+			elif event.type==MOUSEBUTTONDOWN:
 				x,y=event.pos
-				
-				if JUGAR_V.collidepoint(x,y):
-					jugar=True
-
-				elif SALIR_V.collidepoint(x,y):
-					pygame.quit() 
-					sys.exit()
-		
+				if SIGUIENTE_V.collidepoint(x,y):
+					siguiente=True
+	
 		pygame.display.update()
 
-	return jugar
+def obtenerJugada2(A:[[int]],jugadores:[str],turno):
+	
+	#Inicializar arreglo para almacenar casillas
+	TABLERO_POS=[[0 for x in range(0,8)] for y in range(0,8)]
+	ancho,largo=800,600
+	
+
+	#Crear Ventana
+	VENTANA=pygame.display.set_mode((ancho,largo))
+	pygame.display.set_caption("¡Reversi! v0.1")
+
+	#Fuente
+	fuente=pygame.font.Font("FUENTES/Turtles.ttf",30)
+
+	#Cargar Imagenes
+	casillaVacia=pygame.image.load("IMAGENES/casillas.png")
+	fichaNegra=pygame.image.load("IMAGENES/negra.png")
+	fichaBlanca=pygame.image.load("IMAGENES/blanca.png")	
+	FONDO=pygame.image.load("IMAGENES/FONDO.png")
+	TURNO=pygame.image.load("IMAGENES/TURNO.png")
+	SIGUIENTE=pygame.image.load("IMAGENES/SIGUIENTE.png")
+
+	#Colores
+	GRIS=(130,130,130)
+	VERDE=(72,111,25)
+	BLANCO=(255,255,255)
+	
+
+	#Crear letras
+	letras=[
+	fuente.render("A",1,GRIS),  # 1:Bool, Alisado de las letras
+	fuente.render("B",1,GRIS),
+	fuente.render("C",1,GRIS),
+	fuente.render("D",1,GRIS),
+	fuente.render("E",1,GRIS),
+	fuente.render("F",1,GRIS),
+	fuente.render("G",1,GRIS),
+	fuente.render("H",1,GRIS)
+	]	
+			#Pintar fondo de ventana
+	VENTANA.blit(FONDO,(0,0))
+	jugada=False
+	
+	while not(jugada):
+
+		#Insertar imagenes del tablero (Casillas, fichas)
+		TableroPosy=60
+
+		for x in range(0,8):
+			
+			TableroPosx=60
+			
+			for y in range(0,8):
+				
+				if A[x][y]==0:
+
+					TABLERO_POS[x][y]=VENTANA.blit(casillaVacia,(TableroPosx,TableroPosy))
+					
+				
+				elif A[x][y]==1:
+					TABLERO_POS[x][y]=VENTANA.blit(fichaNegra,(TableroPosx,TableroPosy))
+					
+
+				elif A[x][y]==2:
+					TABLERO_POS[x][y]=VENTANA.blit(fichaBlanca,(TableroPosx,TableroPosy))
+					
+				
+				TableroPosx+=60	
+			
+			TableroPosy+=60
+
+		#Instertar Numeros, y texto al tablero
+
+		PosLetrasNumeros=80
+		for i in range(0,8):
+
+			VENTANA.blit(fuente.render(str(i+1),1,GRIS),(35,PosLetrasNumeros))
+			VENTANA.blit(fuente.render(str(i+1),1,GRIS),(545,PosLetrasNumeros))		
+
+			VENTANA.blit(letras[i],(PosLetrasNumeros,30))
+			VENTANA.blit(letras[i],(PosLetrasNumeros,540))
+			PosLetrasNumeros+=60
+
+		#Tablero de puntuacion
+		pygame.draw.rect(VENTANA,GRIS,(590,120,200,40),4)
+		pygame.draw.rect(VENTANA,GRIS,(590,160,200,90),4)
+		VENTANA.blit(TURNO,(630,115))
+
+		if turno==1:
+			VENTANA.blit(fuente.render(str(jugadores[0]),1,VERDE),(600,180))
+		else:
+			VENTANA.blit(fuente.render(str(jugadores[1]),1,VERDE),(600,180))
+
+
+		for event in pygame.event.get():
+			if event.type==QUIT:
+				pygame.quit() 
+				sys.exit()
+
+			elif event.type==MOUSEBUTTONDOWN:
+				x,y=event.pos
+				for i in range(0,8):
+					for j in range(0,8):
+						if TABLERO_POS[i][j].collidepoint(x,y) and A[i][j]==0:
+							jugada=True
+							x,y=i,j
+	
+		pygame.display.update()
+
+	return x,y
+
+
 
 ##PROGRAMA PRINCIPAL
 
@@ -368,20 +478,20 @@ while DeseaJugar():
 		turno=2
 		jugadores=Jugadores()
 		TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
-		dibujar(tablero,jugadores,FichasNegras,FichasBlancas)
+		TableroYPuntuacion(tablero,jugadores,FichasNegras,FichasBlancas)
 		
 
 		while TotalFichas>0:
 			
-			turno,jugador=CambiarTurno(jugadores,turno)
+			turno=CambiarTurno(turno)
 			
-			x,y=obtenerJugada(jugador)
+			x,y=obtenerJugada2(tablero,jugadores,turno)
 			
 			realizarJugada(turno,tablero,x,y)
 			
 			TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
 			
-			dibujar(tablero,jugadores,FichasNegras,FichasBlancas)
+			TableroYPuntuacion(tablero,jugadores,FichasNegras,FichasBlancas)
 
 		
 		
