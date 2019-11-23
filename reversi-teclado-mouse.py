@@ -217,18 +217,28 @@ def QuedanFichas(tablero:[[int]]):
 
 
 def TraducirJugada(x,y):
+		
+	letras='abcdefgh'
+
+	y=y.lower()
+
+	assert( any(y==letras[i] for i in range(0,8)) )
 	
+	x=int(x)
+
+	assert(0<x<=8)
 	
-	letras='abcdefgh'	
-	
+	x-=1
+
 	
 	for i in range(0,8):
 		if y==letras[i]:
-			y=i
-	
-	x=x=int(x)-1
-	return x,y
+			y=i	
 
+	assert (0<=x<8 and 0<=y<8)
+	
+
+	return x,y
 
 def RealizarJugada(turno:int,A:[[int]],x:int,y:int):
 	A[x][y]=turno
@@ -686,41 +696,37 @@ from pygame.locals import *
 pygame.init()
 
 
+
+
 while DeseaJugar():
 		
-		tablero=inicializarTablero()
-		turno=1
-		
-		TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
-		jugadores=Jugadores()
-		mouse,teclado=ModoDeJuego()		
+	tablero=inicializarTablero()
+	turno=1
+	
+	TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
+	jugadores=Jugadores()
+	mouse,teclado=ModoDeJuego()		
 
-		while TotalFichas>0:
+	while TotalFichas>0:
 
-			if teclado:
-				x,y=ObtenerJugada1(tablero,jugadores,turno)
-				print(x,y)
-				x,y=TraducirJugada(x,y)
-				####FUNCION AUXILIAR, MIENTRAS NO TENGAMOS LA DE ES VALIDA
-			 
-			else:
-				x,y=ObtenerJugada2(tablero,jugadores,turno)
+		if teclado:	
+				try:
+					x,y=ObtenerJugada1(tablero,jugadores,turno)
+					x,y=TraducirJugada(x,y)
+					validez=True###LLAMADA A LA FUNCION ES VALIDA
+				except:
+					validez=False###LLAMADA A LA FUNCION ES VALIDA
+		 
+		elif mouse:
+			x,y=ObtenerJugada2(tablero,jugadores,turno)
+			validez=True###LLAMADA A LA FUNCION ES VALIDA
 
-
-			validez=True		###LLAMADA A LA FUNCION ES VALIDA
 			
-			if validez:				##SI LA JUGADA ES VALIDA, REALIZA JUGADA, CONSUME FICHA, CAMBIA TURNO
-				RealizarJugada(turno,tablero,x,y)
-				TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
-				###		FALTA FLANQUEO
-				turno=CambiarTurno(turno)
-			
-			TableroYPuntuacion(tablero,jugadores,FichasNegras,FichasBlancas,validez)
-
 		
+		if validez:				##SI LA JUGADA ES VALIDA, REALIZA JUGADA, CONSUME FICHA, CAMBIA TURNO
+			RealizarJugada(turno,tablero,x,y)
+			TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
+			###		FALTA FLANQUEO
+			turno=CambiarTurno(turno)
 		
-		
-
-
-
-
+		TableroYPuntuacion(tablero,jugadores,FichasNegras,FichasBlancas,validez)
