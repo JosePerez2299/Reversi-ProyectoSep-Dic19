@@ -246,17 +246,11 @@ def RealizarJugada(turno:int,A:[[int]],x:int,y:int):
 
 def TableroYPuntuacion(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:int,Validez:bool):
 
-	assert(len(A)==8 and all(len(A[i])==8 for i in range(0,8)))
-	
 	ancho,largo=800,600
 	
-
 	#Crear Ventana
 	VENTANA=pygame.display.set_mode((ancho,largo))
 	pygame.display.set_caption("¡Reversi! v0.1")
-
-	#Fuente
-	fuente=pygame.font.Font("FUENTES/Turtles.ttf",30)
 
 	#Cargar Imagenes
 	casillaVacia=pygame.image.load("IMAGENES/casillas.png")
@@ -265,6 +259,9 @@ def TableroYPuntuacion(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:
 	FONDO=pygame.image.load("IMAGENES/FONDO.png")
 	PUNTUACION=pygame.image.load("IMAGENES/PUNTUACION.png")
 	SIGUIENTE=pygame.image.load("IMAGENES/SIGUIENTE.png")
+	
+	#Fuente
+	fuente=pygame.font.Font("FUENTES/Turtles.ttf",30)
 	#Colores
 	GRIS=(130,130,130)
 	VERDE=(72,111,25)
@@ -291,6 +288,17 @@ def TableroYPuntuacion(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:
 	siguiente=False
 	
 	while not(siguiente):
+
+		for event in pygame.event.get():
+			if event.type==QUIT:
+				pygame.quit() 
+				sys.exit()
+
+			elif event.type==MOUSEBUTTONDOWN:
+				x,y=event.pos
+				if SIGUIENTE_V.collidepoint(x,y):
+					siguiente=True
+	
 
 		#Insertar imagenes del tablero (Casillas, fichas)
 		TableroPosy=60
@@ -345,21 +353,12 @@ def TableroYPuntuacion(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:
 
 
 
-		for event in pygame.event.get():
-			if event.type==QUIT:
-				pygame.quit() 
-				sys.exit()
 
-			elif event.type==MOUSEBUTTONDOWN:
-				x,y=event.pos
-				if SIGUIENTE_V.collidepoint(x,y):
-					siguiente=True
-	
 		pygame.display.update()
 
 def ObtenerJugada1(A:[[int]],jugadores:[str],turno):
 
-	import time
+	pygame.init()
 	
 	ancho,largo=800,600
 	
@@ -404,11 +403,13 @@ def ObtenerJugada1(A:[[int]],jugadores:[str],turno):
 
 	
 	while jugada[0]=="" or jugada[1]=="":
+		
 		for event in pygame.event.get():
 			if event.type==QUIT:
 				pygame.quit() 
 				sys.exit()
 
+			
 			elif event.type==pygame.KEYDOWN:
 				if  jugada[0]=="":
 					
@@ -690,13 +691,10 @@ def ModoDeJuego():
 ##PROGRAMA PRINCIPAL
 
 
-import pygame,sys
+import pygame,sys,time
 from pygame.locals import *
 
 pygame.init()
-
-
-
 
 while DeseaJugar():
 		
@@ -710,12 +708,14 @@ while DeseaJugar():
 	while TotalFichas>0:
 
 		if teclado:	
-				try:
-					x,y=ObtenerJugada1(tablero,jugadores,turno)
-					x,y=TraducirJugada(x,y)
-					validez=True###LLAMADA A LA FUNCION ES VALIDA
-				except:
-					validez=False###LLAMADA A LA FUNCION ES VALIDA
+			
+			x,y=ObtenerJugada1(tablero,jugadores,turno)
+			
+			try:
+				x,y=TraducirJugada(x,y)
+				validez=True #LLAMADA A LA FUNCION ES VALIDA	
+			except:
+				validez=False #No se pudo traducir la jugada, por tanto no es valida
 		 
 		elif mouse:
 			x,y=ObtenerJugada2(tablero,jugadores,turno)
@@ -723,10 +723,10 @@ while DeseaJugar():
 
 			
 		
-		if validez:				##SI LA JUGADA ES VALIDA, REALIZA JUGADA, CONSUME FICHA, CAMBIA TURNO
+		if validez:##SI LA JUGADA ES VALIDA, REALIZA JUGADA, CONSUME FICHA, CAMBIA TURNO
 			RealizarJugada(turno,tablero,x,y)
 			TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
-			###		FALTA FLANQUEO
+			###FALTA FLANQUEO
 			turno=CambiarTurno(turno)
 		
 		TableroYPuntuacion(tablero,jugadores,FichasNegras,FichasBlancas,validez)
