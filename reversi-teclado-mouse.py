@@ -707,7 +707,7 @@ while DeseaJugar():
 				x,y=ObtenerJugada2(tablero,jugadores,turno)
 
 
-			validez=False			###LLAMADA A LA FUNCION ES VALIDA
+			validez=True		###LLAMADA A LA FUNCION ES VALIDA
 			
 			if validez:				##SI LA JUGADA ES VALIDA, REALIZA JUGADA, CONSUME FICHA, CAMBIA TURNO
 				RealizarJugada(turno,tablero,x,y)
