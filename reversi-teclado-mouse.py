@@ -372,11 +372,13 @@ def ObtenerJugada1(A:[[int]],jugadores:[str],turno):
 
 	#Cargar Imagenes
 	casillaVacia=pygame.image.load("IMAGENES/casillas.png")
+	casillaValida=pygame.image.load("IMAGENES/jugadaValida.png")
 	fichaNegra=pygame.image.load("IMAGENES/negra.png")
 	fichaBlanca=pygame.image.load("IMAGENES/blanca.png")	
 	FONDO=pygame.image.load("IMAGENES/FONDO.png")
 	TURNO=pygame.image.load("IMAGENES/TURNO.png")
 	SIGUIENTE=pygame.image.load("IMAGENES/SIGUIENTE.png")
+
 
 	#Colores
 	GRIS=(130,130,130)
@@ -452,6 +454,9 @@ def ObtenerJugada1(A:[[int]],jugadores:[str],turno):
 
 				elif A[x][y]==2:
 					VENTANA.blit(fichaBlanca,(TableroPosx,TableroPosy))
+
+				elif A[x][y]==3:
+					VENTANA.blit(casillaValida,(TableroPosx,TableroPosy))
 					
 				
 				TableroPosx+=60	
@@ -518,7 +523,8 @@ def ObtenerJugada2(A:[[int]],jugadores:[str],turno):
 	#Cargar Imagenes
 	casillaVacia=pygame.image.load("IMAGENES/casillas.png")
 	fichaNegra=pygame.image.load("IMAGENES/negra.png")
-	fichaBlanca=pygame.image.load("IMAGENES/blanca.png")	
+	fichaBlanca=pygame.image.load("IMAGENES/blanca.png")
+	casillaValida=pygame.image.load("IMAGENES/jugadaValida.png")	
 	FONDO=pygame.image.load("IMAGENES/FONDO.png")
 	TURNO=pygame.image.load("IMAGENES/TURNO.png")
 	SIGUIENTE=pygame.image.load("IMAGENES/SIGUIENTE.png")
@@ -566,6 +572,9 @@ def ObtenerJugada2(A:[[int]],jugadores:[str],turno):
 
 				elif A[x][y]==2:
 					TABLERO_POS[x][y]=VENTANA.blit(fichaBlanca,(TableroPosx,TableroPosy))
+
+				elif A[x][y]==3:
+					TABLERO_POS[x][y]=VENTANA.blit(casillaValida,(TableroPosx,TableroPosy))
 					
 				
 				TableroPosx+=60	
@@ -604,7 +613,7 @@ def ObtenerJugada2(A:[[int]],jugadores:[str],turno):
 				x,y=event.pos
 				for i in range(0,8):
 					for j in range(0,8):
-						if TABLERO_POS[i][j].collidepoint(x,y) and A[i][j]==0:
+						if TABLERO_POS[i][j].collidepoint(x,y):
 							jugada=True
 							x,y=i,j
 	
@@ -682,7 +691,160 @@ def ModoDeJuego():
 
 	return MOUSE,TECLADO
 
+def esValida(x,y,tablero,turno):
+	if turno==1:
+		op=2
+	else:
+		op=1
 
+	validez=False
+	casillasPorCambiar=[]
+
+	if tablero[x][y]!=0:
+		return validez,casillasPorCambiar
+
+	#Una fila abajo
+	if x+1<7 and tablero[x+1][y]==op:
+		xder=x+1
+	
+		while xder<7 and tablero[xder][y]==op:
+			xder+=1
+
+		if tablero[xder][y]==turno:
+			validez=True
+			i=0
+			while xder-i>x:
+				casillasPorCambiar.append([xder-i,y])
+				i+=1
+
+	#fila arriba
+	if x-1>0 and tablero[x-1][y]==op:
+		
+		xizq=x-1
+	
+		while xizq>=0 and tablero[xizq][y]==op:
+			xizq-=1
+
+		if tablero[xizq][y]==turno:
+			validez=True
+			i=0
+			
+			while xizq+i<x:
+				casillasPorCambiar.append([xizq+i,y])
+				i+=1
+
+	#columna derecha
+	if y+1<7 and tablero[x][y+1]==op:
+		
+		yder=y+1
+	
+		while yder<7 and tablero[x][yder]==op:
+			yder+=1
+
+		if tablero[x][yder]==turno:
+			validez=True
+			i=0
+			while yder-i>y:
+				casillasPorCambiar.append([x,yder-i])
+				i+=1
+
+	#columna izq
+	if y-1>0 and tablero[x][y-1]==op:
+		
+		yizq=y-1
+	
+		while yizq>0 and tablero[x][yizq]==op:
+			yizq-=1
+
+		if tablero[x][yizq]==turno:
+			validez=True
+			i=0
+			while yizq+i<y:
+				casillasPorCambiar.append([x,yizq+i])
+				i+=1
+	
+	#diagonal inferior der
+	if x+1<7 and y+1<7 and tablero[x+1][y+1]==op:
+		xder=x+1
+		yder=y+1
+		
+		while xder<7 and yder<7 and tablero[xder][yder]==op:
+			xder+=1
+			yder+=1
+
+		if tablero[xder][yder]==turno:
+			validez=True
+			i=0
+			while xder-i>x and yder-i>y:
+				casillasPorCambiar.append([xder-i,yder-i])
+				i+=1
+
+
+	#diagonal superior der
+	if x-1>0 and y+1<7 and tablero[x-1][y+1]==op:
+		xder=x-1
+		yder=y+1
+		
+		while xder>0 and yder<7 and tablero[xder][yder]==op:
+			xder-=1
+			yder+=1
+
+		if tablero[xder][yder]==turno:
+			validez=True
+			i=0
+			while xder+i<x and yder-i>y:
+				casillasPorCambiar.append([xder+i,yder-i])
+				i+=1
+
+	if x-1>0 and y-1>0 and tablero[x-1][y-1]==op:
+		xder=x-1
+		yder=y-1
+		
+		while xder>=0 and yder>=0 and tablero[xder][yder]==op:
+			xder-=1
+			yder-=1
+
+		if tablero[xder][yder]==turno:
+			validez=True
+			i=0
+			while xder+i<x and yder+i<y:
+				casillasPorCambiar.append([xder+i,yder+i])
+				i+=1
+
+	if y-1>0 and x+1<7 and tablero[x+1][y-1]==op:
+		xder=x+1
+		yder=y-1
+		
+		while yder>0 and xder<7 and tablero[xder][yder]==op:
+			xder+=1
+			yder-=1
+
+		if tablero[xder][yder]==turno:
+			validez=True
+			i=0
+			while xder-i>x and yder+i<y:
+				casillasPorCambiar.append([xder-i,yder+i])
+				i+=1
+
+
+	return validez,casillasPorCambiar
+
+
+def jugadasValidas(tablero,turno):
+	B=inicializarTablero()
+
+	for x in range(0,8):
+		for y in range(0,8):
+			B[x][y]=tablero[x][y]
+			validez,jugadas=esValida(x,y,tablero,turno)
+			if validez:
+				B[x][y]=3
+
+	return B
+
+def flanqueo(tablero,respuesta,turno):
+	for i in respuesta:
+		tablero[i[0]][i[1]]=turno
 
 
 
@@ -707,26 +869,29 @@ while DeseaJugar():
 
 	while TotalFichas>0:
 
+		tableroValido=jugadasValidas(tablero,turno)
+
 		if teclado:	
 			
-			x,y=ObtenerJugada1(tablero,jugadores,turno)
+			x,y=ObtenerJugada1(tableroValido,jugadores,turno)
 			
 			try:
 				x,y=TraducirJugada(x,y)
-				validez=True #LLAMADA A LA FUNCION ES VALIDA	
+				validez,DirFlanqueo=esValida(x,y,tablero,turno)
 			except:
-				validez=False #No se pudo traducir la jugada, por tanto no es valida
+				validez=False 
 		 
 		elif mouse:
-			x,y=ObtenerJugada2(tablero,jugadores,turno)
-			validez=True###LLAMADA A LA FUNCION ES VALIDA
-
+			
+			x,y=ObtenerJugada2(tableroValido,jugadores,turno)
+			validez,DirFlanqueo=esValida(x,y,tablero,turno)
 			
 		
-		if validez:##SI LA JUGADA ES VALIDA, REALIZA JUGADA, CONSUME FICHA, CAMBIA TURNO
+		if validez:
 			RealizarJugada(turno,tablero,x,y)
 			TotalFichas,FichasNegras,FichasBlancas=QuedanFichas(tablero)
-			###FALTA FLANQUEO
+			flanqueo(tablero,DirFlanqueo,turno)
 			turno=CambiarTurno(turno)
+
 		
 		TableroYPuntuacion(tablero,jugadores,FichasNegras,FichasBlancas,validez)
