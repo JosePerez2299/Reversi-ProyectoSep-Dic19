@@ -1,8 +1,3 @@
-
-##es valida
-#Flanquear
-#obtener jugada
-
 def DeseaJugar():
 	#Crear Ventana
 	ancho,largo=800,600
@@ -125,10 +120,11 @@ def Jugadores():
 						jugadores[0] = jugadores[0][:-1]
 					
 					elif event.key==pygame.K_RETURN:
-						casilla_jug0=False
-						IntroducidoNombre0=True
-						casilla_jug1=True
-						
+						if len(jugadores[0])>0:
+							casilla_jug0=False
+							IntroducidoNombre0=True
+							casilla_jug1=True
+							
 					else:
 						jugadores[0]+=event.unicode
 				
@@ -136,8 +132,9 @@ def Jugadores():
 					if event.key == pygame.K_BACKSPACE:
 						jugadores[1] = jugadores[1][:-1]
 					elif event.key==pygame.K_RETURN:
-						casilla_jug1=False
-						IntroducidoNombre1=True
+						if len(jugadores[1])>0:
+							casilla_jug1=False
+							IntroducidoNombre1=True
 
 					else:
 						jugadores[1]+=event.unicode
@@ -186,7 +183,6 @@ def Jugadores():
 
 def CambiarTurno(turno:int):
 
-	assert(0<turno<=2)
 	
 	if turno==1:
 		turno+=1	
@@ -194,9 +190,8 @@ def CambiarTurno(turno:int):
 	elif turno==2:
 		turno-=1
 
-	assert(0<turno<=2)
-
 	return turno
+
 
 
 def QuedanFichas(tablero:[[int]]):
@@ -216,7 +211,7 @@ def QuedanFichas(tablero:[[int]]):
 	return total,negras,blancas
 
 
-def TraducirJugada(x,y):
+def TraducirJugada(x:str,y:str):
 		
 	letras='abcdefgh'
 
@@ -356,7 +351,9 @@ def TableroYPuntuacion(A:[[int]],jugadores:[str],FichasNegras:int,FichasBlancas:
 
 		pygame.display.update()
 
-def ObtenerJugada1(A:[[int]],jugadores:[str],turno):
+
+
+def ObtenerJugada1(A:[[int]],jugadores:[str],turno:int):
 
 	pygame.init()
 	
@@ -497,8 +494,10 @@ def ObtenerJugada1(A:[[int]],jugadores:[str],turno):
 
 		if turno==1:
 			VENTANA.blit(fuente.render(str(jugadores[0]),0,VERDE),(600,180))
+			VENTANA.blit(pygame.transform.scale(fichaNegra, (40, 40)),(740,170))
 		else:
 			VENTANA.blit(fuente.render(str(jugadores[1]),1,VERDE),(600,180))
+			VENTANA.blit(pygame.transform.scale(fichaBlanca, (40, 40)),(740,170))
 
 		pygame.display.update()
 
@@ -506,7 +505,7 @@ def ObtenerJugada1(A:[[int]],jugadores:[str],turno):
 
 	return jugada[0],jugada[1]
 
-def ObtenerJugada2(A:[[int]],jugadores:[str],turno):
+def ObtenerJugada2(A:[[int]],jugadores:[str],turno:int):
 	
 	#Inicializar arreglo para almacenar casillas
 	TABLERO_POS=[[0 for x in range(0,8)] for y in range(0,8)]
@@ -546,7 +545,7 @@ def ObtenerJugada2(A:[[int]],jugadores:[str],turno):
 	fuente.render("G",0,GRIS),
 	fuente.render("H",0,GRIS)
 	]	
-			#Pintar fondo de ventana
+	#Pintar fondo de ventana
 	VENTANA.blit(FONDO,(0,0))
 	jugada=False
 	
@@ -597,11 +596,14 @@ def ObtenerJugada2(A:[[int]],jugadores:[str],turno):
 		pygame.draw.rect(VENTANA,GRIS,(590,120,200,40),4)
 		pygame.draw.rect(VENTANA,GRIS,(590,160,200,90),4)
 		VENTANA.blit(TURNO,(630,115))
-
+		
 		if turno==1:
 			VENTANA.blit(fuente.render(str(jugadores[0]),0,VERDE),(600,180))
+			VENTANA.blit(pygame.transform.scale(fichaNegra, (40, 40)),(740,170))
 		else:
-			VENTANA.blit(fuente.render(str(jugadores[1]),0,VERDE),(600,180))
+			VENTANA.blit(fuente.render(str(jugadores[1]),1,VERDE),(600,180))
+			VENTANA.blit(pygame.transform.scale(fichaBlanca, (40, 40)),(740,170))
+
 
 
 		for event in pygame.event.get():
@@ -653,12 +655,12 @@ def ModoDeJuego():
 	MODO_JUEGO=fuente.render("Modo de Juego",0,VERDE)
 
 	PosX,PosY=100,300
-	ancho,largo=250,100
+	ancho1,largo1=250,100
 	VENTANA.blit(FONDO,(0,0))
 	VENTANA.blit(TITULO,(120,10))
 
-	CASILLA_MOUSE=pygame.draw.rect(VENTANA,GRIS,(PosX,PosY,ancho,largo),5)#CASILLA INACTIVA JUG1
-	CASILLA_TECLADO=pygame.draw.rect(VENTANA,GRIS,(PosX+350,PosY,ancho,largo),5)#CASILLA INACTIVA JUG2
+	CASILLA_MOUSE=pygame.draw.rect(VENTANA,GRIS,(PosX,PosY,ancho1,largo1),5)#CASILLA INACTIVA JUG1
+	CASILLA_TECLADO=pygame.draw.rect(VENTANA,GRIS,(PosX+350,PosY,ancho1,largo1),5)#CASILLA INACTIVA JUG2
 	VENTANA.blit(MOUSE_V,(PosX+40,PosY+20))
 	VENTANA.blit(TECLADO_V,(PosX+380,PosY+20))
 	VENTANA.blit(MODO_JUEGO,(PosX+180,PosY-50))
@@ -691,7 +693,64 @@ def ModoDeJuego():
 
 	return MOUSE,TECLADO
 
-def esValida(x,y,tablero,turno):
+def FinDelJuego(jugadores:[int],FichasNegras:int,FichasBlancas:int):
+
+	#Crear Ventana
+	ancho,largo=800,600
+	VENTANA=pygame.display.set_mode((ancho,largo))
+	pygame.display.set_caption("¡Reversi! v0.1")
+
+
+	#Colores
+	GRIS=(130,130,130)
+	NEGRO=(0,0,0)
+	VERDE=(72,111,25)
+	BLANCO=(255,255,255)
+	
+	TITULO=pygame.image.load("IMAGENES/TITULO.png")
+	FONDO=pygame.image.load("IMAGENES/FONDO.png")
+	SIGUIENTE=pygame.image.load("IMAGENES/SIGUIENTE.png")
+	fichaNegra=pygame.image.load("IMAGENES/negra.png")
+	fichaBlanca=pygame.image.load("IMAGENES/blanca.png")
+	fuente=pygame.font.Font("FUENTES/Turtles.ttf",60)
+
+	VENTANA.blit(FONDO,(0,0))
+	VENTANA.blit(TITULO,(120,10))
+	SIGUIENTE_V=VENTANA.blit(SIGUIENTE,(580,450))
+	
+
+	if FichasNegras>FichasBlancas:
+		VENTANA.blit(fuente.render("Ganador:",1,BLANCO),(200,300))
+		VENTANA.blit(fuente.render(str(jugadores[0]),1,BLANCO),(250,360))
+		VENTANA.blit(fichaNegra,(480,300))
+	elif FichasBlancas>FichasNegras:
+		VENTANA.blit(fuente.render("Ganador:",1,BLANCO),(200,300))
+		VENTANA.blit(fuente.render(str(jugadores[1]),1,BLANCO),(250,360))
+		VENTANA.blit(fichaBlanca,(480,300))
+
+	else:
+		VENTANA.blit(pygame.fuente.render("EMPATE",1,BLANCO),(300,300))
+
+	fin=False
+
+	while not(fin):
+
+		
+		for event in pygame.event.get():
+			if event.type==QUIT:
+				pygame.quit() 
+				sys.exit()
+
+			elif event.type == pygame.MOUSEBUTTONDOWN:
+				x,y=event.pos
+
+				if SIGUIENTE_V.collidepoint(x,y):
+					fin=True
+		
+		pygame.display.update()
+
+
+def esValida(x:int,y:int,tablero:[[int]],turno:int):
 	if turno==1:
 		op=2
 	else:
@@ -830,19 +889,21 @@ def esValida(x,y,tablero,turno):
 	return validez,casillasPorCambiar
 
 
-def jugadasValidas(tablero,turno):
+def TableroValido(tablero:[[int]],turno:int):
 	B=inicializarTablero()
-
+	cantidadJugadasValidas=0
 	for x in range(0,8):
 		for y in range(0,8):
 			B[x][y]=tablero[x][y]
 			validez,jugadas=esValida(x,y,tablero,turno)
 			if validez:
 				B[x][y]=3
+				cantidadJugadasValidas+=1
 
-	return B
 
-def flanqueo(tablero,respuesta,turno):
+	return B,cantidadJugadasValidas
+
+def flanqueo(tablero:[[int]],respuesta:[int],turno:[int]):
 	for i in respuesta:
 		tablero[i[0]][i[1]]=turno
 
@@ -869,7 +930,14 @@ while DeseaJugar():
 
 	while TotalFichas>0:
 
-		tableroValido=jugadasValidas(tablero,turno)
+		tableroValido,cantidadJugadasValidas=TableroValido(tablero,turno)
+
+		if cantidadJugadasValidas==0:
+			turno=CambiarTurno(turno)
+			tableroValido,cantidadJugadasValidas=TableroValido(tablero,turno)
+			if cantidadJugadasValidas==0:
+				break
+
 
 		if teclado:	
 			
@@ -893,5 +961,6 @@ while DeseaJugar():
 			flanqueo(tablero,DirFlanqueo,turno)
 			turno=CambiarTurno(turno)
 
-		
 		TableroYPuntuacion(tablero,jugadores,FichasNegras,FichasBlancas,validez)
+
+	FinDelJuego(jugadores,FichasNegras,FichasBlancas)
